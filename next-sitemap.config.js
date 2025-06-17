@@ -1,3 +1,4 @@
+// next-sitemap.config.js
 module.exports = {
   siteUrl: 'https://vanshjainblog.vercel.app',
   generateRobotsTxt: true,
