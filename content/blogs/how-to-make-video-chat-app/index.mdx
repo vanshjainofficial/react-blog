@@ -1,0 +1,108 @@
+---
+title: "How to make Video Chat App"
+description: "A full-stack guide to building your own video calling app that supports real-time video, audio, chat, screen sharing, and more — all without using external services like Zoom or Twilio."
+image: video-chat.png
+publishedAt: 2025-06-16 18:30:00
+updatedAt: 2025-06-16 18:30:00
+author: "Vansh Jain"
+isPublished: true
+tags:
+- Coding
+slug: how-to-make-video-chat-app
+---
+
+Ever wondered how apps like Zoom or Google Meet work behind the scenes?
+
+In this post, I’ll break down how I built a **real-time 1:1 video chatting app** using **WebRTC**, **Socket.IO**, and **Express.js** — with features like **video/audio mute, live chat, screen sharing, and instant room codes**.
+
+It’s 100% open-source.  
+👉 [Check the full code on GitHub](https://github.com/vanshjainofficial/Video-Chat-App)
+
+---
+
+## 🚀 What Does This App Do?
+
+This is not just a basic WebRTC demo — it’s a fully working progressive web app with:
+
+✅ 1-on-1 video calling  
+🎤 Toggle mic and camera in-call  
+💬 Real-time chat (with notifications!)  
+📺 Screen sharing with a single click  
+📱 Install as a PWA (Progressive Web App)  
+🔗 Share room codes instantly on WhatsApp, Telegram, etc.  
+🕒 No time limits or restrictions  
+🔐 No login needed, privacy-focused  
+
+---
+
+## 🔧 Core Tech Stack
+
+| Layer | Tech |
+|------|------|
+| Frontend | React.js, WebRTC, HTML5 |
+| Backend | Node.js + Express |
+| Real-Time | Socket.IO |
+| Deployment | Vercel / Render / Railway |
+| Dev Tools | Nodemon, Serve |
+
+---
+
+## 🧱 Step-by-Step Breakdown
+
+### 1. 🎯 What is WebRTC?
+
+> WebRTC = Web Real-Time Communication  
+It allows **peer-to-peer** media streaming directly between browsers without needing to route video/audio through a central server.
+
+That means: lower latency, higher privacy, and free usage.
+
+But WebRTC still needs **signaling** to coordinate the connection — and that’s where **Socket.IO** comes in.
+
+---
+
+### 2. ⚙️ Backend Setup
+
+The backend is kept minimal — it only handles signaling and messaging. Here's what it does:
+
+✅ Create socket connection  
+✅ Emit events like `incomingCall`, `answerCall`, `mediaStatusChanged`, `callTerminated`  
+✅ Enable CORS for frontend communication  
+✅ No database needed — everything is real-time and ephemeral
+
+```js
+// server/index.js
+const express = require("express");
+const http = require("http");
+const socketIO = require("socket.io");
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, {
+  cors: { origin: "*", methods: ["GET", "POST"] },
+});
+
+io.on("connection", (socket) => {
+  socket.emit("socketId", socket.id);
+
+  socket.on("initiateCall", ({ targetId, signalData, senderId, senderName }) => {
+    io.to(targetId).emit("incomingCall", { signal: signalData, from: senderId, name: senderName });
+  });
+
+  socket.on("answerCall", (data) => {
+    io.to(data.to).emit("callAnswered", data);
+  });
+
+  socket.on("changeMediaStatus", ({ mediaType, isActive }) => {
+    socket.broadcast.emit("mediaStatusChanged", { mediaType, isActive });
+  });
+
+  socket.on("sendMessage", ({ targetId, message, senderName }) => {
+    io.to(targetId).emit("receiveMessage", { message, senderName });
+  });
+
+  socket.on("terminateCall", ({ targetId }) => {
+    io.to(targetId).emit("callTerminated");
+  });
+});
+
+server.listen(5002, () => console.log("Server is running on port 5002"));
