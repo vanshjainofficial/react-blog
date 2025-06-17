@@ -8,7 +8,7 @@ module.exports = {
   },
 
   webpack: (config) => {
-    // Custom Velite plugin
+
     class VeliteWebpackPlugin {
       static started = false;
       apply(compiler) {
