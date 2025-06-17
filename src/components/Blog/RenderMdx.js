@@ -3,7 +3,7 @@ import React from 'react'
 import MDXContent from './MdxContent'
 
 const mdxComponents = {
-  // Add any custom components here
+
 }
 
 const RenderMdx = ({blog}) => {
