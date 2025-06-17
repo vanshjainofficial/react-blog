@@ -1,6 +1,7 @@
 // next.config.js
 const { Life_Savers } = require('next/font/google');
 
+/** @type {import('next').NextConfig} */
 module.exports = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -10,7 +11,7 @@ module.exports = {
     class VeliteWebpackPlugin {
       static started = false;
       apply(compiler) {
-        compiler.hooks.beforeCompile.tapPromise('VeliteWebpackPlugin', async () => {
+        compiler.hooks.beforeRun.tapPromise('VeliteWebpackPlugin', async () => {
           if (VeliteWebpackPlugin.started) return;
           VeliteWebpackPlugin.started = true;
           const dev = compiler.options.mode === 'development';
