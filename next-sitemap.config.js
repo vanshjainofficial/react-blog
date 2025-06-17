@@ -1,7 +1,8 @@
-const siteMetadata = require("./src/utils/siteMetaData");
-
-
 module.exports = {
-    siteUrl: siteMetadata.siteUrl,
-    generateRobotsTxt: true,
-  }
+  siteUrl: 'https://vanshjainblog.vercel.app',
+  generateRobotsTxt: true,
+  sitemapSize: 7000,
+  changefreq: 'weekly',
+  priority: 0.7,
+  trailingSlash: false,
+};
